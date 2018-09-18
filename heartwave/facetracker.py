@@ -1,8 +1,8 @@
+import os
 import cv2
 import numpy as np
 
 from heartwave.runner import Runner
-import heartwave.util as util
 import heartwave.conf as conf
 
 
@@ -15,8 +15,10 @@ class FaceTracker(Runner):
     """
     def run(self):
         faceScaling = [0.5, 0.35, 1.0, 1.4]
-        classifier = cv2.CascadeClassifier(
-            util.getResourcePath('lbpcascade_frontalface_improved.xml'))
+        path = os.path.join(
+                os.path.dirname(__file__),
+                'data', 'lbpcascade_frontalface_improved.xml')
+        classifier = cv2.CascadeClassifier(path)
         trackers = []
         t0 = 0.0
         while self.running:

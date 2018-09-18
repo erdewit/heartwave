@@ -1,22 +1,9 @@
 import math
 import time
 import asyncio
-from pathlib import Path
 import PyQt5.Qt as qt
 
 nan = float('nan')
-
-
-def getResourcePath(name):
-    p = Path(__file__).parent / Path('resources', name)
-    return str(p.resolve())
-
-
-def getResource(name):
-    p = getResourcePath(name)
-    with open(p, 'rb') as f:
-        data = f.read()
-    return data
 
 
 def qImage(cvIm):
