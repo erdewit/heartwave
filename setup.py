@@ -12,7 +12,7 @@ with codecs.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='heartwave',
-    version='0.8.3',
+    version='0.8.4',
     description='Heart rate measurement from webcam or video',
     long_description=long_description,
     packages=['heartwave'],

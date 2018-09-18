@@ -12,6 +12,13 @@ Installation
 
     pip3 install heartwave
 
+Usage
+-----
+
+::
+
+    heartwave [optional filename, URL or camera ID]
+
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/heartwave.svg
    :alt: PyPi
