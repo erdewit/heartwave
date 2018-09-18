@@ -35,13 +35,13 @@ class FrameGrabber(Runner):
             fps = capture.get(cv2.CAP_PROP_FPS)
             while self.running:
                 capture.grab()
-                t = time.time()
+                t = time.perf_counter()
                 retval, im = capture.retrieve()
                 if not retval:
                     break
                 frame = Frame(t, im)
                 self.output(frame)
-                pause = t - time.time() + 1 / fps
+                pause = t - time.perf_counter() + 1 / fps
                 if not isLive and pause > 0:
                     time.sleep(pause)
             capture.release()

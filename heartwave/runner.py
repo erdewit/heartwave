@@ -43,6 +43,15 @@ class Runner:
     def __await__(self):
         return (yield from self.outQ.get())
 
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.outQ.qsize():
+            return self.outQ.get_nowait()
+        else:
+            raise StopIteration
+
     def start(self):
         """
         Start processing.
