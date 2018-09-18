@@ -91,10 +91,10 @@ class Window(qt.QMainWindow):
                 if not self.running:
                     break
                 tracker.feed(frame)
-                if tracker.hasOutput():
+                while tracker.hasOutput():
                     frame, faces = await tracker
                     analyzer.feed((frame, faces))
-                    if analyzer.hasOutput():
+                    while analyzer.hasOutput():
                         frame, faces, persons = await analyzer
                         # skip drawing if lagging behind
                         if not grabber.hasOutput():
