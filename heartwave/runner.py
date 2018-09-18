@@ -108,6 +108,6 @@ class Runner:
     def run(self):
         """
         Processing loop. Implementations should stop when self.running
-        is False or when Pipeline.Stop is encountered in the input queue.
+        is False or when Runner.Stop is encountered in the input queue.
         """
         pass
