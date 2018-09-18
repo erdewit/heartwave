@@ -90,17 +90,14 @@ class Window(qt.QMainWindow):
             async for frame in grabber:
                 if not self.running:
                     break
-                tracker.feed(frame)
-                while tracker.hasOutput():
-                    frame, faces = await tracker
-                    analyzer.feed((frame, faces))
-                    while analyzer.hasOutput():
-                        frame, faces, persons = await analyzer
-                        # skip drawing if lagging behind
-                        if not grabber.hasOutput():
-                            self.view.draw(frame.image, persons)
-                            if self.curves.isVisible():
-                                self.curves.plot(persons)
+                tracker += frame
+                for frame, faces in tracker:
+                    analyzer += (frame, faces)
+                for frame, faces, persons in analyzer:
+                    if not analyzer:
+                        self.view.draw(frame.image, persons)
+                        if self.curves.isVisible():
+                            self.curves.plot(persons)
 
 
 def main():
