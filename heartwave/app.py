@@ -83,21 +83,21 @@ class Window(qt.QMainWindow):
         alongside the GUI.
         """
         self.running = True
+        scene = SceneAnalyzer()
         async with \
                 FrameGrabber(conf.CAM_ID) as grabber, \
-                FaceTracker() as tracker, \
-                SceneAnalyzer() as analyzer:
+                FaceTracker() as tracker:
             async for frame in grabber:
                 if not self.running:
                     break
                 tracker += frame
                 for frame, faces in tracker:
-                    analyzer += (frame, faces)
-                for frame, faces, persons in analyzer:
-                    if not analyzer:
-                        self.view.draw(frame.image, persons)
-                        if self.curves.isVisible():
-                            self.curves.plot(persons)
+                    persons = scene.analyze(frame, faces)
+                    if not tracker:
+                        for person in persons:
+                            self.view.draw(frame.image, persons)
+                            if self.curves.isVisible():
+                                self.curves.plot(persons)
 
 
 def main():

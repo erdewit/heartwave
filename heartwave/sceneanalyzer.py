@@ -1,39 +1,30 @@
 from heartwave.person import Person
-from heartwave.runner import Runner
 
 
-class SceneAnalyzer(Runner):
+class SceneAnalyzer:
     """
-    Processing stage to locate and analyze persons in a scene.
-
-    Input: (frame, faces)
-    Output: (frame, faces, persons)
+    Analyze persons in a scene.
     """
-    def run(self):
-        persons = []
-        while self.running:
-            tup = self.getInput()
-            if tup is Runner.Stop:
-                break
-            frame, faces = tup
+    def __init__(self):
+        self.persons = []
 
-            present = set()
-            for face in faces:
-                x, y, w, h = face
-                cx = x + w / 2
-                cy = y + h / 2
-                person = next(
-                    (p for p in persons if p.contains(cx, cy)), None)
-                if person:
-                    person.setFace(face)
-                else:
-                    person = Person(face)
-                    persons.append(person)
-                present.add(person)
-            persons = [p for p in persons if p in present]
+    def analyze(self, frame, faces):
+        present = set()
+        for face in faces:
+            x, y, w, h = face
+            cx = x + w / 2
+            cy = y + h / 2
+            person = next(
+                (p for p in self.persons if p.contains(cx, cy)), None)
+            if person:
+                person.setFace(face)
+            else:
+                person = Person(face)
+                self.persons.append(person)
+            present.add(person)
+        self.persons = [p for p in self.persons if p in present]
 
-            greenIm = frame.image[:, :, 1]
-            for person in persons:
-                person.analyze(frame.time, greenIm)
-
-            self.output((frame, faces, persons))
+        greenIm = frame.image[:, :, 1]
+        for person in self.persons:
+            person.analyze(frame.time, greenIm)
+        return self.persons
