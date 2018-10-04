@@ -62,7 +62,8 @@ class Person:
             self.prevFace = None
         self.corrected.append(raw * self.correction)
 
-        nyquistFreq = 0.5 * self._getFPS()
+        fps = self._getFPS()
+        nyquistFreq = 0.5 * fps
         self.filtered = self._filter(self.corrected, nyquistFreq)
         if not len(self.filtered):
             return
@@ -73,10 +74,11 @@ class Person:
         if conf.MIN_BPM <= bpm <= conf.MAX_BPM:
             self.bpm.append(bpm)
             self._index += 1
-            p = conf.AV_BPM_SAMPLES
-            if not self._index % p:
-                av = np.average(self.bpm[-p:])
-                self.avBpm.append(av)
+            if fps:
+                p = int(0.5 + conf.AV_BPM_PERIOD * fps)
+                if p and not self._index % p:
+                    av = np.average(self.bpm[-p:])
+                    self.avBpm.append(av)
 
     def _getSignal(self, greenIm, face):
         """
