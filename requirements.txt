@@ -1,0 +1,5 @@
+PyQt5
+PyQtChart
+numpy
+scipy
+opencv-contrib-python
