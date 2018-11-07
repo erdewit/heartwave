@@ -47,8 +47,8 @@ class Person:
             self._firstTime = t
         if t < self._firstTime + conf.STARTUP_TIME:
             return
-        for arr in (self.times, self.raw, self.corrected,
-                    self.bpm, self.avBpm):
+        for arr in (
+                self.times, self.raw, self.corrected, self.bpm, self.avBpm):
             if len(arr) >= conf.MAX_SAMPLES:
                 arr.pop(0)
 
@@ -118,8 +118,9 @@ class Person:
         times = np.linspace(t0, t1, sz)
         interpolated = np.interp(times, self.times, data)
 
-        r = [min(1, bpm / 60 / nyquistFreq) for bpm in (
-                conf.MIN_BPM, conf.MAX_BPM)]
+        r = [
+            min(1, bpm / 60 / nyquistFreq)
+            for bpm in (conf.MIN_BPM, conf.MAX_BPM)]
         b, a = butter(3, r, btype='bandpass')
         filtered = filtfilt(b, a, interpolated)
         return filtered

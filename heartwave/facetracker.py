@@ -16,8 +16,8 @@ class FaceTracker(Runner):
     def run(self):
         faceScaling = [0.5, 0.35, 1.0, 1.4]
         path = os.path.join(
-                os.path.dirname(__file__),
-                'data', 'lbpcascade_frontalface_improved.xml')
+            os.path.dirname(__file__),
+            'data', 'lbpcascade_frontalface_improved.xml')
         classifier = cv2.CascadeClassifier(path)
         trackers = []
         t0 = 0.0
@@ -29,16 +29,18 @@ class FaceTracker(Runner):
 
             for tracker in trackers:
                 tracker.update(t1, im)
-            trackers = [t for t in trackers
-                        if t1 - t.lastTrackTime < conf.FACE_TRACKING_TIMEOUT]
+            trackers = [
+                t for t in trackers
+                if t1 - t.lastTrackTime < conf.FACE_TRACKING_TIMEOUT]
 
             if t1 - t0 >= conf.FACE_DETECT_PAUSE:
                 gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
                 gray = cv2.equalizeHist(gray)
                 dets = classifier.detectMultiScale(
                     gray, scaleFactor=1.1, minNeighbors=5)
-                faces = [self.scaleFace(x, y, w, h, faceScaling) for (
-                        x, y, w, h) in dets]
+                faces = [
+                    self.scaleFace(x, y, w, h, faceScaling)
+                    for (x, y, w, h) in dets]
                 for face in faces:
                     x, y, w, h = face
                     tracker = next(
@@ -108,5 +110,6 @@ class Tracker:
         """
         x0, y0, w0, h0 = self.roi
         x1, y1, w1, h1 = roi
-        return (x0 <= x1 + w1 and x1 <= x0 + w0 and
-                y0 <= y1 + h1 and y1 <= y0 + h0)
+        return (
+            x0 <= x1 + w1 and x1 <= x0 + w0 and
+            y0 <= y1 + h1 and y1 <= y0 + h0)

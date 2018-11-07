@@ -6,8 +6,7 @@ import queue
 class Runner:
     """
     General processing stage that can be fed input, run some processing
-    in a separate thread and make the results available by awaiting
-    or as an asynchronous iterator.
+    in a separate thread and make the results as an asynchronous iterator.
     """
     Stop = object()
 
@@ -28,7 +27,7 @@ class Runner:
     async def __aexit__(self, *_excinfo):
         self.stop()
 
-    async def __aiter__(self):
+    def __aiter__(self):
         if not self.running:
             self.start()
         return self
@@ -40,8 +39,8 @@ class Runner:
                 return result
         raise StopAsyncIteration
 
-    def __await__(self):
-        return (yield from self.outQ.get())
+    def get(self):
+        return self.outQ.get()
 
     def __iter__(self):
         return self
