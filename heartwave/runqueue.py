@@ -3,22 +3,23 @@ import threading
 import queue
 
 
-class Runner:
+class RunQueue(asyncio.Queue):
     """
     General processing stage that can be fed input, run some processing
-    in a separate thread and make the results as an asynchronous iterator.
+    in a separate thread. The results are made available as a queue that
+    can serve as a normal or asynchronous iterator.
     """
     Stop = object()
 
     def __init__(self):
+        asyncio.Queue.__init__(self)
         self.inQ = queue.Queue()
-        self.outQ = asyncio.Queue()
         self.running = False
         self._thread = None
         self._loop = asyncio.get_event_loop()
 
     def __len__(self):
-        return self.outQ.qsize()
+        return self.qsize()
 
     async def __aenter__(self):
         self.start()
@@ -34,22 +35,23 @@ class Runner:
 
     async def __anext__(self):
         if self.running:
-            result = await self.outQ.get()
-            if result is not Runner.Stop:
+            result = await self.get()
+            if result is not RunQueue.Stop:
                 return result
         raise StopAsyncIteration
-
-    def get(self):
-        return self.outQ.get()
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.outQ.qsize():
-            return self.outQ.get_nowait()
+        if self.qsize():
+            return self.get_nowait()
         else:
             raise StopIteration
+
+    def clear(self):
+        while not self.empty():
+            self.get_nowait()
 
     def start(self):
         """
@@ -68,11 +70,11 @@ class Runner:
         if not self.running:
             return
         self.running = False
-        self.inQ.put_nowait(Runner.Stop)
-        self.outQ.put_nowait(Runner.Stop)
+        self.inQ.put_nowait(RunQueue.Stop)
+        self.put_nowait(RunQueue.Stop)
         self._thread.join()
         self._thread = None
-        self.outQ = asyncio.Queue()
+        self.clear()
 
     def feed(self, data):
         """
@@ -87,13 +89,7 @@ class Runner:
         """
         Add result of processing to the output of this iterator.
         """
-        self._loop.call_soon_threadsafe(self.outQ.put_nowait, result)
-
-    def hasOutput(self):
-        """
-        Is there any output ready?
-        """
-        return self.outQ.qsize() > 0
+        self._loop.call_soon_threadsafe(self.put_nowait, result)
 
     def getInput(self):
         """
@@ -103,7 +99,7 @@ class Runner:
 
     def getLatestInput(self):
         """
-        Get latest input element, skipping over earlier input.
+        Get latest input element, dropping earlier input.
         """
         data = self.inQ.get()
         try:

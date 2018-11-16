@@ -3,13 +3,13 @@ import cv2
 import string
 from collections import namedtuple
 
-from heartwave.runner import Runner
+from heartwave.runqueue import RunQueue
 
 
 Frame = namedtuple('Frame', ['time', 'image'])
 
 
-class FrameGrabber(Runner):
+class FrameGrabber(RunQueue):
     """
     Make a video stream available as a series of frames.
 
@@ -17,7 +17,7 @@ class FrameGrabber(Runner):
     Output: frame
     """
     def __init__(self, camId=0, width=640, height=480):
-        Runner.__init__(self)
+        RunQueue.__init__(self)
         self._args = camId, width, height
 
     def run(self):
@@ -45,4 +45,5 @@ class FrameGrabber(Runner):
                 if not isLive and pause > 0:
                     time.sleep(pause)
             capture.release()
-        self.output(Runner.Stop)
+            print('stop', self.running)
+        self.output(RunQueue.Stop)
