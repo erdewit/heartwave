@@ -1,6 +1,8 @@
 import sys
 import asyncio
 import functools
+import datetime
+from pathlib import Path
 
 import PyQt5.Qt as qt
 
@@ -58,7 +60,12 @@ class Window(qt.QMainWindow):
         self.start()
 
     def onSnapshot(self):
-        print('TBD')
+        timeStamp = datetime.datetime.now().strftime('%Y%m%d%_H%M%S_%f')
+        name = f'heartwave_{timeStamp}_im.png'
+        self.view.image.save(str(Path.home() / name))
+        if self.curves.isVisible():
+            name = f'heartwave_{timeStamp}_curve.png'
+            self.curves.grab().save(str(Path.home() / name))
 
     def onToggleCurves(self):
         self.curves.setVisible(not self.curves.isVisible())
