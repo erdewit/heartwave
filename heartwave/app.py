@@ -47,12 +47,17 @@ class Window(qt.QMainWindow):
 
     def onOpenFile(self):
         path, _filter = qt.QFileDialog.getOpenFileName(self)
-        self.stop()
-        conf.CAM_ID = path
-        self.start()
+        if path:
+            self.stop()
+            conf.CAM_ID = path
+            self.start()
 
     def onOpenURL(self):
-        print('TBD')
+        url, ok = qt.QInputDialog.getText(None, 'Open URL', 'URL:')
+        if ok:
+            self.stop()
+            conf.CAM_ID = url
+            self.start()
 
     def onCamera(self, camId):
         self.stop()

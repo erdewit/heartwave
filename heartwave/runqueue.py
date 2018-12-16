@@ -5,7 +5,7 @@ import queue
 
 class RunQueue(asyncio.Queue):
     """
-    General processing stage that can be fed input, run some processing
+    General processing stage that can be fed input and run some processing
     in a separate thread. The results are made available as a queue that
     can serve as a normal or asynchronous iterator.
     """
