@@ -3,7 +3,7 @@ import threading
 import queue
 
 
-class RunQueue(asyncio.Queue):
+class Runner(asyncio.Queue):
     """
     General processing stage that can be fed input and run some processing
     in a separate thread. The results are made available as a queue that
@@ -36,7 +36,7 @@ class RunQueue(asyncio.Queue):
     async def __anext__(self):
         if self.running:
             result = await self.get()
-            if result is not RunQueue.Stop:
+            if result is not Runner.Stop:
                 return result
         raise StopAsyncIteration
 
@@ -70,8 +70,8 @@ class RunQueue(asyncio.Queue):
         if not self.running:
             return
         self.running = False
-        self.inQ.put_nowait(RunQueue.Stop)
-        self.put_nowait(RunQueue.Stop)
+        self.inQ.put_nowait(Runner.Stop)
+        self.put_nowait(Runner.Stop)
         self._thread.join()
         self._thread = None
         self.clear()

@@ -2,11 +2,11 @@ import os
 import cv2
 import numpy as np
 
-from heartwave.runqueue import RunQueue
+from heartwave.runner import Runner
 import heartwave.conf as conf
 
 
-class FaceTracker(RunQueue):
+class FaceTracker(Runner):
     """
     Processing stage to detect and track faces.
 
@@ -23,7 +23,7 @@ class FaceTracker(RunQueue):
         t0 = 0.0
         while self.running:
             frame = self.getInput()
-            if frame is RunQueue.Stop:
+            if frame is Runner.Stop:
                 break
             t1, im = frame
 

@@ -76,7 +76,7 @@ class Person:
             self._index += 1
             if fps:
                 p = int(0.5 + conf.AV_BPM_PERIOD * fps)
-                if p and not self._index % p:
+                if len(self.bpm) == conf.MAX_SAMPLES and not self._index % p:
                     av = np.average(self.bpm[-p:])
                     self.avBpm.append(av)
 
