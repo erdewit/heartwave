@@ -5,7 +5,9 @@ import heartwave.util as util
 
 
 class View(qt.QWidget):
-
+    """
+    Video canvas with overlay.
+    """
     def __init__(self, parent):
         qt.QWidget.__init__(self, parent)
         self.image = None
@@ -27,7 +29,7 @@ class View(qt.QWidget):
                 p.setPen(qt.QColor(255, 255, 255))
                 bpm = person.bpm[-1] if len(person.bpm) else 0
                 p.drawText(
-                    x, y, w, h, qt.Qt.AlignHCenter, str(int(bpm)))
+                    x, y, w, h, qt.Qt.AlignHCenter, '♡' + str(int(bpm)))
         self.image = qim
         self.setMinimumSize(qim.size())
         self.update()
@@ -39,7 +41,9 @@ class View(qt.QWidget):
 
 
 class CurveWidget(qt.QSplitter):
-
+    """
+    Realtime curves.
+    """
     def __init__(self, parent=None):
         qt.QSplitter.__init__(self, qt.Qt.Vertical, parent=parent)
         self.setMinimumHeight(640)
