@@ -8,7 +8,6 @@ MAX_SAMPLES = 256
 AV_BPM_PERIOD = 1.0
 FACE_DETECT_PAUSE = 1.0
 FACE_TRACKING_TIMEOUT = 5
-USE_OPENGL = False
 
 # allow user settings to override the standard settings
 path = Path.home() / '.heartwave.conf'

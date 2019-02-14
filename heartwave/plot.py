@@ -1,8 +1,6 @@
 import PyQt5.Qt as qt
 import PyQt5.QtChart as qc
 
-import heartwave.conf as conf
-
 
 class Plot(qc.QChartView):
 
@@ -30,8 +28,6 @@ class Plot(qc.QChartView):
             append(*c)
         if pen:
             series.setPen(pen)
-        if conf.USE_OPENGL:
-            series.setUseOpenGL(True)
         chart = self.chart()
         chart.addSeries(series)
         if autoAxes:
