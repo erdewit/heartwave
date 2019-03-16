@@ -1,14 +1,20 @@
 from heartwave.person import Person
 
+from eventkit import Op
 
-class SceneAnalyzer:
+
+class SceneAnalyzer(Op):
     """
-    Analyze persons in a scene.
+    Analyze heartrate for persons in a scene::
+
+        (frame, faces) -> (frame, faces, persons)
+
     """
-    def __init__(self):
+    def __init__(self, source=None):
+        Op.__init__(self, source)
         self.persons = []
 
-    def analyze(self, frame, faces):
+    def on_source(self, frame, faces):
         present = set()
         for face in faces:
             x, y, w, h = face
@@ -27,4 +33,4 @@ class SceneAnalyzer:
         greenIm = frame.image[:, :, 1]
         for person in self.persons:
             person.analyze(frame.time, greenIm)
-        return self.persons
+        self.emit(frame, faces, self.persons)

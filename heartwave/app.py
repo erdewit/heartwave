@@ -7,7 +7,7 @@ from pathlib import Path
 import PyQt5.Qt as qt
 
 from heartwave.widgets import View, CurveWidget
-from heartwave.framegrabber import FrameGrabber
+from heartwave.videostream import VideoStream
 from heartwave.facetracker import FaceTracker
 from heartwave.sceneanalyzer import SceneAnalyzer
 import heartwave.conf as conf
@@ -42,7 +42,7 @@ class Window(qt.QMainWindow):
         addAction(menu, 'Toggle curves', 'T', self.onToggleCurves)
 
         self.pipe = None
-        self.running = False
+        self.video = None
         self.start()
 
     def onOpenFile(self):
@@ -75,51 +75,31 @@ class Window(qt.QMainWindow):
     def onToggleCurves(self):
         self.curves.setVisible(not self.curves.isVisible())
 
-    def start(self):
-        self.running = True
-        self.pipe = asyncio.ensure_future(self.pipeline())
-
-    def stop(self):
-        self.running = False
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.pipe)
-        self.pipe = None
-
     def closeEvent(self, ev):
         self.stop()
         self.curves.close()
 
+    def start(self):
+        self.pipe = asyncio.ensure_future(self.pipeline())
+
+    def stop(self):
+        self.video.stop()
+
     async def pipeline(self):
-        """
-        Video capture- and processing pipeline that runs asynchronously
-        alongside the GUI.
-        """
-        self.running = True
-        scene = SceneAnalyzer()
-        async with \
-                FrameGrabber(conf.CAM_ID) as grabber, \
-                FaceTracker() as tracker:
-            async for frame in grabber:
-                if not self.running:
-                    break
-                tracker += frame
-                for frame, faces in tracker:
-                    persons = scene.analyze(frame, faces)
-                    if not tracker:
-                        for person in persons:
-                            self.view.draw(frame.image, persons)
-                            if self.curves.isVisible():
-                                self.curves.plot(persons)
+        self.video = VideoStream(conf.CAM_ID)
+        scene = self.video | FaceTracker | SceneAnalyzer
+        lastScene = scene.aiter(skip_to_last=True)
+        async for frame, faces, persons in lastScene:
+            for person in persons:
+                self.view.draw(frame.image, persons)
+            if self.curves.isVisible():
+                self.curves.plot(persons)
 
 
-def main():
+if __name__ == '__main__':
     if len(sys.argv) > 1:
         conf.CAM_ID = sys.argv[1]
     qApp = qt.QApplication(sys.argv)  # noqa
     win = Window()
     win.show()
     util.run()
-
-
-if __name__ == '__main__':
-    main()

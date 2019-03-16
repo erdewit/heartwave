@@ -2,64 +2,62 @@ import os
 import cv2
 import numpy as np
 
-from heartwave.runner import Runner
+from eventkit import Op
+
 import heartwave.conf as conf
 
 
-class FaceTracker(Runner):
+class FaceTracker(Op):
     """
-    Processing stage to detect and track faces.
+    Detect and track faces::
 
-    Input: frame
-    Output: (frame, faces)
+        (frame) -> (frame, faces)
     """
-    def run(self):
-        faceScaling = [0.5, 0.35, 1.0, 1.4]
+    def __init__(self, source=None):
+        Op.__init__(self, source)
         path = os.path.join(
             os.path.dirname(__file__),
             'data', 'lbpcascade_frontalface_improved.xml')
-        classifier = cv2.CascadeClassifier(path)
-        trackers = []
-        t0 = 0.0
-        while self.running:
-            frame = self.getInput()
-            if frame is Runner.Stop:
-                break
-            t1, im = frame
+        self.classifier = cv2.CascadeClassifier(path)
+        self.trackers = []
+        self.t0 = 0.0
 
-            for tracker in trackers:
-                tracker.update(t1, im)
-            trackers = [
-                t for t in trackers
-                if t1 - t.lastTrackTime < conf.FACE_TRACKING_TIMEOUT]
+    def on_source(self, frame):
+        t1, im = frame
 
-            if t1 - t0 >= conf.FACE_DETECT_PAUSE:
-                gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-                gray = cv2.equalizeHist(gray)
-                dets = classifier.detectMultiScale(
-                    gray, scaleFactor=1.1, minNeighbors=5)
-                faces = [
-                    self.scaleFace(x, y, w, h, faceScaling)
-                    for (x, y, w, h) in dets]
-                for face in faces:
-                    x, y, w, h = face
-                    tracker = next(
-                        (t for t in trackers if t.overlaps(face)), None)
-                    if tracker:
-                        weight = 0.2 if tracker.ok else 1
-                        tracker.updateROI(t1, im, face, weight)
-                    else:
-                        tracker = Tracker(t1, im, face)
-                        trackers.append(tracker)
-                t0 = t1
-            faces = [t.roi for t in trackers]
-            self.output((frame, faces))
+        for tracker in self.trackers:
+            tracker.update(t1, im)
+        self.trackers = [
+            t for t in self.trackers
+            if t1 - t.lastTrackTime < conf.FACE_TRACKING_TIMEOUT]
 
-    def scaleFace(self, x, y, w, h, scaling):
+        if t1 - self.t0 >= conf.FACE_DETECT_PAUSE:
+            gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+            gray = cv2.equalizeHist(gray)
+            dets = self.classifier.detectMultiScale(
+                gray, scaleFactor=1.1, minNeighbors=5)
+            faces = [
+                self.scaleFace(x, y, w, h)
+                for (x, y, w, h) in dets]
+            for face in faces:
+                x, y, w, h = face
+                tracker = next(
+                    (t for t in self.trackers if t.overlaps(face)), None)
+                if tracker:
+                    weight = 0.2 if tracker.ok else 1
+                    tracker.updateROI(t1, im, face, weight)
+                else:
+                    tracker = Tracker(t1, im, face)
+                    self.trackers.append(tracker)
+            self.t0 = t1
+        faces = [t.roi for t in self.trackers]
+        self.emit(frame, faces)
+
+    def scaleFace(self, x, y, w, h):
         '''
         Calculate whole face based on detected face coordinates.
         '''
-        fx, fy, fw, fh = scaling
+        fx, fy, fw, fh = [0.5, 0.35, 1.0, 1.4]
         rw = w * fw
         rh = h * fh
         rx = x + fx * w - rw / 2
