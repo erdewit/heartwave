@@ -27,10 +27,10 @@ Usage
 Links
 -----
 
-`webcam-pulse-detector <https://github.com/thearn/webcam-pulse-detector>`_
-`The enigma of Mayer waves <https://academic.oup.com/cardiovascres/article/70/1/12/408540>`_
-`Remote Detection of Photoplethysmographic Systolic and Diastolic Peaks Using a Digital Camera <https://www.media.mit.edu/publications/remote-detection-of-photoplethysmographic-systolic-and-diastolic-peaks-using-a-digital-camera>`_
-`Measuring heart rate with a smartphone camera >http://www.ignaciomellado.es/blog/Measuring-heart-rate-with-a-smartphone-camera>`_
+    * `webcam-pulse-detector <https://github.com/thearn/webcam-pulse-detector>`_
+    * `The enigma of Mayer waves <https://academic.oup.com/cardiovascres/article/70/1/12/408540>`_
+    * `Remote Detection of Photoplethysmographic Systolic and Diastolic Peaks Using a Digital Camera <https://www.media.mit.edu/publications/remote-detection-of-photoplethysmographic-systolic-and-diastolic-peaks-using-a-digital-camera>`_
+    * `Measuring heart rate with a smartphone camera <http://www.ignaciomellado.es/blog/Measuring-heart-rate-with-a-smartphone-camera>`_
 
 
 .. |PyPiVersion| image:: https://img.shields.io/pypi/v/heartwave.svg
