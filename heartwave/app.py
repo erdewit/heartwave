@@ -89,9 +89,8 @@ class Window(qt.QMainWindow):
         self.video = VideoStream(conf.CAM_ID)
         scene = self.video | FaceTracker | SceneAnalyzer
         lastScene = scene.aiter(skip_to_last=True)
-        async for frame, faces, persons in lastScene:
-            for person in persons:
-                self.view.draw(frame.image, persons)
+        async for frame, persons in lastScene:
+            self.view.draw(frame.image, persons)
             if self.curves.isVisible():
                 self.curves.plot(persons)
 
