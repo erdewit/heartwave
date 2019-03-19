@@ -7,7 +7,7 @@ class SceneAnalyzer(Op):
     """
     Analyze heartrate for persons in a scene::
 
-        (frame, faces) -> (frame, faces, persons)
+        (frame, faces) -> (frame, persons)
 
     """
     def __init__(self, source=None):
