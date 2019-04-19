@@ -95,10 +95,14 @@ class Window(qt.QMainWindow):
                 self.curves.plot(persons)
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) > 1:
         conf.CAM_ID = sys.argv[1]
     qApp = qt.QApplication(sys.argv)  # noqa
     win = Window()
     win.show()
     util.run()
+
+
+if __name__ == '__main__':
+    main()
