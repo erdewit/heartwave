@@ -81,7 +81,10 @@ class Tracker:
         """
         self.lastTrackTime = self.lastRoiTime = t
         self.roi += weight * (roi - self.roi)
-        self.tracker = cv2.TrackerMedianFlow.create()
+
+        Tracker = getattr(cv2, 'TrackerMedianFlow', None) or \
+                  getattr(cv2, 'legacy_TrackerMedianFlow')
+        self.tracker = Tracker.create()
         self.tracker.init(im, tuple(self.roi))
         self.ok = True
 
